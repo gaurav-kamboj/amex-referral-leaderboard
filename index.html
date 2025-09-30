@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AMEX Referral Leaderboard</title>
+        <style>
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #002663;
+                color: #fff;
+            }
+            header {
+                text-align: center;
+                padding: 2rem 1rem;
+                background: #001b4d;
+            }
+            header h1 {
+                font-size: 1.8rem;
+                margin: 0;
+            }
+            .container {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 1.5rem;
+                background: #fff;
+                color: #333;
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
+                margin-top: -20px;
+            }
+            /* Table for desktop */
+            table {
+                width: 90%;
+                margin: 0 auto;
+                border-collapse: collapse;
+                margin-top: 1rem;
+                font-size: 0.95rem;
+            }
+            table thead {
+                background: #0050a0;
+                color: #fff;
+            }
+            table th,
+            table td {
+                padding: 0.8rem 1rem;
+                text-align: center;
+                border-bottom: 1px solid #ccc;
+            }
+            table th.sortable:hover {
+                cursor: pointer;
+                background: #003d7a;
+            }
+            a.ref-link {
+                color: #0050a0;
+                text-decoration: none;
+                font-weight: bold;
+            }
+            a.ref-link:hover {
+                text-decoration: underline;
+            }
+
+            /* Card design for mobile */
+            .card-list {
+                display: none;
+            }
+            .card {
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .card h3 {
+                margin: 0;
+                font-size: 1.1rem;
+                color: #002663;
+            }
+            .card .twitter {
+                color: #555;
+                font-size: 0.85rem;
+            }
+            .card .voucher {
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #0050a0;
+            }
+            .card .details {
+                margin-top: 0.8rem;
+                display: none;
+            }
+            .card .ref-link {
+                display: inline-block;
+                background: #0050a0;
+                color: #fff;
+                padding: 0.5rem 1rem;
+                border-radius: 6px;
+                text-decoration: none;
+                font-size: 0.9rem;
+            }
+            .card .ref-link:hover {
+                background: #003d7a;
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                table {
+                    display: none;
+                }
+                .card-list {
+                    display: block;
+                }
+            }
+
+            footer {
+                margin-top: 2rem;
+                padding: 1.2rem;
+                font-size: 0.8rem;
+                text-align: center;
+                color: #ccc;
+                background: #001b4d;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>American Express Referral Leaderboard</h1>
+            <p>Compare referral offers and pick the best deal!</p>
+        </header>
+
+        <div class="container">
+            <!-- Table for desktop -->
+            <table id="leaderboard">
+                <thead>
+                    <tr>
+                        <th class="sortable" onclick="sortTable('name')">
+                            Name
+                        </th>
+                        <th>Twitter</th>
+                        <th class="sortable" onclick="sortTable('voucher')">
+                            Voucher (₹)
+                        </th>
+                        <th>Offer Details</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body"></tbody>
+            </table>
+
+            <!-- Card list for mobile -->
+            <div class="card-list" id="card-list"></div>
+        </div>
+
+        <footer>
+            Disclaimer: This leaderboard only tracks referral offers shared by
+            individuals. We are not affiliated with American Express or involved
+            in the deals. Please reach out to the person directly to confirm
+            their offer before applying.
+        </footer>
+
+        <script>
+            const referrals = [
+                {
+                    name: "CA. Roshan Agarwal",
+                    twitter: "@rhoeshan",
+                    voucher: 1000,
+                    link: "https://x.com/rhoeshan/status/1972925962858705160",
+                },
+                {
+                    name: "Professor Cardz",
+                    twitter: "@ProfessorCardz",
+                    voucher: 1000,
+                    link: "https://x.com/ProfessorCardz/status/1972936504918827493",
+                },
+            ];
+
+            function renderTable(data) {
+                const tbody = document.getElementById("leaderboard-body");
+                tbody.innerHTML = "";
+                data.forEach((r) => {
+                    tbody.innerHTML += `
+          <tr>
+            <td>${r.name}</td>
+            <td>${r.twitter}</td>
+            <td>${r.voucher}</td>
+            <td><a href="${r.link}" class="ref-link" target="_blank">Offer Link</a></td>
+          </tr>`;
+                });
+            }
+
+            function renderCards(data) {
+                const container = document.getElementById("card-list");
+                container.innerHTML = "";
+                data.forEach((r, i) => {
+                    container.innerHTML += `
+          <div class="card" onclick="toggleDetails(${i})">
+            <div class="card-header">
+              <div>
+                <h3>${r.name}</h3>
+                <div class="twitter">${r.twitter}</div>
+              </div>
+              <div class="voucher">₹${r.voucher}</div>
+            </div>
+            <div class="details" id="details-${i}">
+              <a href="${r.link}" class="ref-link" target="_blank">Offer Link</a>
+            </div>
+          </div>`;
+                });
+            }
+
+            function toggleDetails(i) {
+                const el = document.getElementById(`details-${i}`);
+                el.style.display =
+                    el.style.display === "block" ? "none" : "block";
+            }
+
+            function sortTable(key) {
+                let sorted;
+                if (key === "voucher")
+                    sorted = referrals.sort((a, b) => b.voucher - a.voucher);
+                else
+                    sorted = referrals.sort((a, b) =>
+                        a.name.localeCompare(b.name),
+                    );
+                renderTable(sorted);
+                renderCards(sorted);
+            }
+
+            // Default sort by voucher desc
+            window.onload = () => {
+                sortTable("voucher");
+            };
+        </script>
+    </body>
+</html>
